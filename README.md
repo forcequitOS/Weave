@@ -26,3 +26,15 @@ An Intel or Apple Silicon Mac running macOS Ventura or newer (Monterey is also c
 Built with Xcode 15, SwiftUI, WebKit, and of course, made (mostly) with ChatGPT.
 
 Current app icon designer: [@dootskyre on Twitter](https://twitter.com/dootskyre)
+
+**Coming Soon:**
+
+Keyboard shortcut support
+
+Not completely breaking while using tabs
+
+Pinch to zoom support
+
+Minor tweaks to address bar functionality
+
+Share Sheet support
