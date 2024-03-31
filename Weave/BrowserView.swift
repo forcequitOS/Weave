@@ -146,7 +146,7 @@ struct BrowserView: View {
                         Label("Download Page", systemImage: "square.and.arrow.down")
                     }
                     .help("Download page source")
-                    .keyboardShortcut("d", modifiers: [.command, .shift])
+                    .keyboardShortcut("s", modifiers: [.command])
                 }
                 
                 // Copy link button (cmd + shift + c)
