@@ -73,9 +73,9 @@ struct BrowserView: View {
             .navigationTitle(pageTitle)
         
             // Toolbar with keyboard shortcuts and tooltips
-            .toolbar(id:"overall") {
-                // Back button
-                ToolbarItem(id: "back", placement: .navigation) {
+            .toolbar (id:"toolbar"){
+                // Back button (cmd + ←)
+                ToolbarItem(id:"back", placement: .navigation) {
                     Button(action: goBack) {
                         Label("Back", systemImage: "chevron.left")
                     }
@@ -84,8 +84,8 @@ struct BrowserView: View {
                     .disabled(!webView.canGoBack)
                 }
                 
-                // Forward button
-                ToolbarItem(id: "forward", placement: .navigation) {
+                // Forward button (cmd + →)
+                ToolbarItem(id:"forward", placement: .navigation) {
                     Button(action: goForward) {
                         Label("Forward", systemImage: "chevron.right")
                     }
@@ -95,10 +95,10 @@ struct BrowserView: View {
                 }
                 
                 // Address Bar
-                ToolbarItem(id: "address", placement: .status) {
+                ToolbarItem(id:"address", placement: .status) {
                     TextField("Search or enter URL", text: $URLString, onCommit: loadURL)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
-                        .frame(width: 500, height: nil) // Set a fixed width
+                        .frame(width: 500) // Set a fixed width
                         .multilineTextAlignment(.center)
                         .lineLimit(1) // Limit to 1 line
                         .truncationMode(.tail) // Truncates at the end
@@ -108,8 +108,8 @@ struct BrowserView: View {
                         .help("Enter a URL or search term")
                 }
                 
-                // Refresh button
-                ToolbarItem(id: "refresh", placement: .navigation) {
+                // Refresh button (cmd + r)
+                ToolbarItem(id:"refresh", placement: .navigation) {
                     Button(action: refresh) {
                         Label("Refresh", systemImage: "arrow.clockwise")
                     }
@@ -117,41 +117,69 @@ struct BrowserView: View {
                     .keyboardShortcut("r", modifiers: [.command])
                 }
                 
-                // Favicon display
-                ToolbarItem(id: "favicon", placement: .navigation) {
-                    // Site favicon
-                    if let faviconImage = faviconImage {
-                        Image(nsImage: faviconImage)
-                            .resizable()
-                            .frame(width: 18, height: 18)
-                            .font(Font.title.weight(.bold))
-                    } else {
-                        // Placeholder favicon
-                        Image(systemName: "globe.americas.fill")
-                            .resizable()
-                            .frame(width: 18, height: 18)
-                            .font(Font.title.weight(.bold))
-                    }
-                }
+                // Favicon display, wrapped in an HStack to avoid a stupid SwiftUI bug
+                ToolbarItem(id:"favicon", placement: .navigation) {
+                    HStack {
+                        if let faviconImage = faviconImage {
+                            // Site favicon
+                            Image(nsImage: faviconImage)
+                                .resizable()
+                                .frame(width: 18, height: 18)
+                        } else {
+                            // Placeholder favicon
+                            Image(systemName: "globe.americas.fill")
+                                .resizable()
+                                .frame(width: 18, height: 18)
+                                .font(Font.title.weight(.bold))
+                                    }
+                                }
+                            }
                 
                 // Spacer between address bar and Share button chunk
-                ToolbarItem(id: "spacer1", placement: .primaryAction) {
+                ToolbarItem(id:"spacer", placement: .primaryAction) {
                     Spacer()
                 }
                 
-                // Share button
-                ToolbarItem(id: "share", placement: .primaryAction) {
+                // Download button (cmd + shift + d)
+                ToolbarItem(id: "download", placement: .primaryAction, showsByDefault: false) {
+                    Button(action: downloadPage) {
+                        Label("Download Page", systemImage: "square.and.arrow.down")
+                    }
+                    .help("Download page source")
+                    .keyboardShortcut("d", modifiers: [.command, .shift])
+                }
+                
+                // Copy link button (cmd + shift + c)
+                ToolbarItem(id:"copy", placement: .primaryAction, showsByDefault: false) {
+                    Button(action: {
+                        copyURL()
+                    }) {
+                        Label("Copy", systemImage: "doc.on.doc")
+                    }
+                    .help("Copy current URL to clipboard")
+                    .keyboardShortcut("c", modifiers: [.command, .shift])
+                }
+                
+                // Share button (cmd + shift + s)
+                ToolbarItem(id:"share", placement: .primaryAction) {
                     Button(action: {
                         shareURL(URLString)
                     }) {
                         Label("Share", systemImage: "square.and.arrow.up")
                     }
                     .help("Share this page")
+                    .keyboardShortcut("s", modifiers: [.command, .shift])
                 }
             }
     }
 
     // Sets up functions for webpage commands
+    private func copyURL() {
+        let pasteboard = NSPasteboard.general
+        pasteboard.declareTypes([.string], owner: nil)
+        pasteboard.setString(URLString, forType: .string)
+    }
+    
     private func goBack() {
         if webView.canGoBack {
             webView.goBack()
@@ -215,6 +243,26 @@ struct BrowserView: View {
             return URLString
         } else {
             return "https://\(URLString)"
+        }
+    }
+
+    private func downloadPage() {
+        webView.evaluateJavaScript("document.URL") { (result, error) in
+            if let urlString = result as? String, let url = URL(string: urlString) {
+                let downloadTask = URLSession.shared.downloadTask(with: url) { (location, response, error) in
+                    guard let location = location else { return }
+                    let documentsPath = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask)[0]
+                    let destinationURL = documentsPath.appendingPathComponent(response?.suggestedFilename ?? url.lastPathComponent)
+
+                    do {
+                        try FileManager.default.moveItem(at: location, to: destinationURL)
+                        print("File downloaded successfully: \(destinationURL.absoluteString)")
+                    } catch {
+                        print("Error saving file: \(error)")
+                    }
+                }
+                downloadTask.resume()
+            }
         }
     }
 }
