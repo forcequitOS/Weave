@@ -11,6 +11,10 @@ Refreshing pages
 
 Unified search and URL bar
 
+A clean design
+
+macOS tab and multi-window support
+
 Favicon and page title support
 
 An extremely basic attempt at adblocking
@@ -19,9 +23,7 @@ Completely WebKit and SwiftUI based, extremely lightweight and efficient
 
 Uses system font on all webpages
 
-**Requirements:**
-
-An Intel or Apple Silicon Mac running macOS Ventura or newer (Monterey is also confirmed to work if you change the build target, it just doesn't display correctly.)
+**REQUIRES:** An Intel or Apple Silicon Mac running macOS Monterey or later
 
 Built with Xcode 15, SwiftUI, WebKit, and of course, made (mostly) with ChatGPT.
 
@@ -29,12 +31,10 @@ Current app icon designer: [@dootskyre on Twitter](https://twitter.com/dootskyre
 
 **Coming Soon:**
 
-Keyboard shortcut support
+Updates to the iPad app
 
-Not completely breaking while using tabs
+Potentially a home button
 
-Pinch to zoom support
+File download support
 
-Minor tweaks to address bar functionality
-
-Share Sheet support
+Maybe some commands to enter into the address bar, for easter eggs and functional reasons...
