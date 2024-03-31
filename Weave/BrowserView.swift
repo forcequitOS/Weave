@@ -73,11 +73,11 @@ struct BrowserView: View {
             .navigationTitle(pageTitle)
         
             // Toolbar with keyboard shortcuts and tooltips
-            .toolbar {
+            .toolbar(id:"overall") {
                 // Back button
-                ToolbarItem(placement: .navigation) {
+                ToolbarItem(id: "back", placement: .navigation) {
                     Button(action: goBack) {
-                        Image(systemName: "chevron.left")
+                        Label("Back", systemImage: "chevron.left")
                     }
                     .help("Go back")
                     .keyboardShortcut(KeyEquivalent.leftArrow, modifiers: [.command])
@@ -85,9 +85,9 @@ struct BrowserView: View {
                 }
                 
                 // Forward button
-                ToolbarItem(placement: .navigation) {
+                ToolbarItem(id: "forward", placement: .navigation) {
                     Button(action: goForward) {
-                        Image(systemName: "chevron.right")
+                        Label("Forward", systemImage: "chevron.right")
                     }
                     .help("Go forward")
                     .keyboardShortcut(KeyEquivalent.rightArrow, modifiers: [.command])
@@ -95,7 +95,7 @@ struct BrowserView: View {
                 }
                 
                 // Address Bar
-                ToolbarItem(placement: .status) {
+                ToolbarItem(id: "address", placement: .status) {
                     TextField("Search or enter URL", text: $URLString, onCommit: loadURL)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                         .frame(width: 500, height: nil) // Set a fixed width
@@ -109,39 +109,42 @@ struct BrowserView: View {
                 }
                 
                 // Refresh button
-                ToolbarItem(placement: .navigation) {
+                ToolbarItem(id: "refresh", placement: .navigation) {
                     Button(action: refresh) {
-                        Image(systemName: "arrow.clockwise")
+                        Label("Refresh", systemImage: "arrow.clockwise")
                     }
                     .help("Refresh this page")
                     .keyboardShortcut("r", modifiers: [.command])
                 }
                 
                 // Favicon display
-                ToolbarItem(placement: .navigation) {
+                ToolbarItem(id: "favicon", placement: .navigation) {
+                    // Site favicon
                     if let faviconImage = faviconImage {
                         Image(nsImage: faviconImage)
                             .resizable()
-                            .frame(width: 18, height: 18) // Size set to 18x18 for favicon
+                            .frame(width: 18, height: 18)
+                            .font(Font.title.weight(.bold))
                     } else {
+                        // Placeholder favicon
                         Image(systemName: "globe.americas.fill")
                             .resizable()
-                            .frame(width: 18, height: 18) // Placeholder icon
+                            .frame(width: 18, height: 18)
                             .font(Font.title.weight(.bold))
                     }
                 }
                 
-                // Spacer between address bar and next button chunk
-                ToolbarItem(placement: .primaryAction) {
+                // Spacer between address bar and Share button chunk
+                ToolbarItem(id: "spacer1", placement: .primaryAction) {
                     Spacer()
                 }
                 
                 // Share button
-                ToolbarItem(placement: .primaryAction) {
+                ToolbarItem(id: "share", placement: .primaryAction) {
                     Button(action: {
                         shareURL(URLString)
                     }) {
-                        Image(systemName: "square.and.arrow.up")
+                        Label("Share", systemImage: "square.and.arrow.up")
                     }
                     .help("Share this page")
                 }
