@@ -58,10 +58,10 @@ struct BrowserView: View {
                     `;
                     document.head.appendChild(adBlockStyle);
                 """
-                let adBlockInject = WKUserScript(source: adBlockerScript, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
+                let adBlockInject = WKUserScript(source: adBlockerScript, injectionTime: .atDocumentEnd, forMainFrameOnly: false)
                 webView.configuration.userContentController.addUserScript(adBlockInject)
 
-                let CSSInject = WKUserScript(source: styleSheet, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
+                let CSSInject = WKUserScript(source: styleSheet, injectionTime: .atDocumentEnd, forMainFrameOnly: false)
                 webView.configuration.userContentController.addUserScript(CSSInject)
                 
                 // Loads URL when app opens
