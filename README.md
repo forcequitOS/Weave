@@ -1,21 +1,19 @@
 # Weave for Mac
-### This was an experiment I did to make a web browser using ChatGPT and is also my playground for messing around with Swift(UI). DO NOT USE THIS!
+### This was an experiment I did to make a web browser using ChatGPT and is also my playground for messing around with Swift(UI). Don't seriously use this as your main browser.
 ![A screenshot of the Weave application running on a Mac inside of a window](https://github.com/CtrliPhones/Weave/blob/main/Weave%20Preview.png?raw=true)
 *But, while we're here...*
 
 ## Features:
 
-Back/forward page navigation
-
-Refreshing pages
-
-Unified search and URL bar
+Basic navigation stuff
 
 A clean design
 
-macOS tab and multi-window support
+macOS tabbing and multi-window support
 
-Favicon and page title support
+Support for macOS built in toolbar customizations
+
+Favicon and page title loading support
 
 An extremely basic attempt at adblocking
 
@@ -27,15 +25,15 @@ Uses system font on all webpages
 
 **REQUIRES** an Intel or Apple Silicon Mac running macOS Monterey or later
 
-Built with Xcode 15, SwiftUI, WebKit, and of course, made (mostly) with ChatGPT.
+Built with Xcode 15, SwiftUI, WebKit, and of course, made (kinda) with ChatGPT.
 
 Current app icon designer: [@dootskyre on Twitter](https://twitter.com/dootskyre)
 
 ## What's next?
 
-Updates to the iPad app
-
 Potentially a home button
+
+A clear cache/cookies/data button (near future honestly)
 
 File download support
 
