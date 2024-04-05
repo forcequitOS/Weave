@@ -1,5 +1,5 @@
 // Designed with ❤️ and 🤖 by Ctrl.
-// Made specifically for your Mac. Try Weave Touch for the iPad!
+// Made specifically for your Mac. Try Weave Touch for your iPhone and iPad!
 
 import SwiftUI
 import WebKit
@@ -19,17 +19,33 @@ extension NSColor {
     }
 }
 
-// Sets up BrowserView and does basic customizations
+// Initializes BrowserView's variables for basic setup
 struct BrowserView: View {
     @State private var webView = WKWebView()
     @State private var URLString = ""
     @State private var pageTitle = "Weave"
     @State private var faviconImage: NSImage?
-    @State private var userAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.3.1 Safari/605.1.15"
-
+    @State private var userAgent: String = {
+        // All this stuff is to automatically fetch 3 key values to automatically build a user agent, the WebKit version, Safari version (based on current OS), and a default user agent given by WKWebView.
+        let defaultUserAgent = WKWebView().value(forKey: "userAgent")
+        let sysVersion = ProcessInfo.processInfo.operatingSystemVersion
+        var safariVersion = "\(sysVersion.majorVersion + 3).\(sysVersion.minorVersion).\(sysVersion.patchVersion)"
+        var webKitVersion = ""
+        if let userAgentString = defaultUserAgent as? String {
+            if let startIndex = userAgentString.range(of: "AppleWebKit/")?.upperBound {
+                let versionSubstring = userAgentString[startIndex...]
+                if let endIndex = versionSubstring.firstIndex(of: " ") ?? versionSubstring.firstIndex(of: "/") {
+                    webKitVersion = String(versionSubstring[..<endIndex])
+                }
+            }
+        }
+        return "\(defaultUserAgent ?? "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/621.4.20 (KHTML, like Gecko) Weave/FallbackUserAgent") Version/\(safariVersion) Safari/\(webKitVersion)"
+    }()
+    
     var body: some View {
         WebView(webView: webView, pageTitle: $pageTitle, URLString: $URLString, faviconImage: $faviconImage, userAgent: $userAgent)
             .onAppear {
+                print(userAgent)
                 // CSS Style Injection
                 var sysAccent = NSColor.systemAccentColor.hexString
                 let styleSheet = """
@@ -74,13 +90,14 @@ struct BrowserView: View {
         
             // Toolbar with keyboard shortcuts and tooltips
             .toolbar (id:"toolbar"){
+                
                 // Back button (cmd + ←)
                 ToolbarItem(id:"back", placement: .navigation) {
                     Button(action: goBack) {
                         Label("Back", systemImage: "chevron.left")
                     }
                     .help("Go back")
-                    .keyboardShortcut(KeyEquivalent.leftArrow, modifiers: [.command])
+                    .keyboardShortcut(.leftArrow, modifiers: [.command])
                     .disabled(!webView.canGoBack)
                 }
                 
@@ -90,7 +107,7 @@ struct BrowserView: View {
                         Label("Forward", systemImage: "chevron.right")
                     }
                     .help("Go forward")
-                    .keyboardShortcut(KeyEquivalent.rightArrow, modifiers: [.command])
+                    .keyboardShortcut(.rightArrow, modifiers: [.command])
                     .disabled(!webView.canGoForward)
                 }
                 
@@ -140,7 +157,7 @@ struct BrowserView: View {
                     Spacer()
                 }
                 
-                // Download button (cmd + shift + d)
+                // Download button (cmd + s)
                 ToolbarItem(id: "download", placement: .primaryAction, showsByDefault: false) {
                     Button(action: downloadPage) {
                         Label("Download Page", systemImage: "square.and.arrow.down")
@@ -174,12 +191,14 @@ struct BrowserView: View {
     }
 
     // Sets up functions for webpage commands
+    // Copies URL to clipboard
     private func copyURL() {
         let pasteboard = NSPasteboard.general
         pasteboard.declareTypes([.string], owner: nil)
         pasteboard.setString(URLString, forType: .string)
     }
     
+    // Goes back a page and then refreshes (to load new title and favicon data)
     private func goBack() {
         if webView.canGoBack {
             webView.goBack()
@@ -190,6 +209,7 @@ struct BrowserView: View {
         }
     }
 
+    // Goes forward a page and then refreshes (to load new title and favicon data)
     private func goForward() {
         if webView.canGoForward {
             webView.goForward()
@@ -200,10 +220,12 @@ struct BrowserView: View {
         }
     }
 
+    // Simply reloads webView
     private func refresh() {
         webView.reload()
     }
 
+    // Shares URL with macOS default Share Sheet
     private func shareURL(_ URLString: String) {
         guard let url = URL(string: URLString) else {
             print("Invalid URL")
@@ -216,20 +238,28 @@ struct BrowserView: View {
         sharingServicePicker.show(relativeTo: webView.bounds, of: webView, preferredEdge: .minY)
     }
     
+    // Checks if URL is valid, if it is, it loads, if it isn't, it does not
     private func loadURL() {
         let trimmedURLString = URLString.trimmingCharacters(in: .whitespacesAndNewlines)
-        if trimmedURLString.contains(".") {
-            // Contains a dot, likely a URL
-            if let url = URL(string: addHttpIfNeeded(trimmedURLString)) {
-                let request = URLRequest(url: url)
-                webView.load(request)
+        // Finds final dot in string
+        if let lastDotIndex = trimmedURLString.lastIndex(of: ".") {
+            let afterLastDotIndex = trimmedURLString.index(after: lastDotIndex)
+            // Check if there are characters following the last period
+            if afterLastDotIndex < trimmedURLString.endIndex {
+                // Characters following the last period, so assume it's a domain
+                if let url = URL(string: addHTTPIfNeeded(trimmedURLString)) {
+                    let request = URLRequest(url: url)
+                    webView.load(request)
+                    return
+                }
             }
-        } else {
-            // No dot, treat as search query
-            search()
         }
+        // No more than 1 character following final period, likely a search query
+        search()
     }
 
+
+    // Function to search with Google
     private func search() {
         guard let searchQuery = URLString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else { return }
         if let searchURL = URL(string: "https://google.com/search?q=\(searchQuery)") {
@@ -238,7 +268,8 @@ struct BrowserView: View {
         }
     }
 
-    private func addHttpIfNeeded(_ URLString: String) -> String {
+    // Adds https:// to URLs that don't have it
+    private func addHTTPIfNeeded(_ URLString: String) -> String {
         if URLString.hasPrefix("http://") || URLString.hasPrefix("https://") {
             return URLString
         } else {
@@ -246,6 +277,7 @@ struct BrowserView: View {
         }
     }
 
+    // Downloads HTML file of page source to ~/Downloads folder
     private func downloadPage() {
         webView.evaluateJavaScript("document.URL") { (result, error) in
             if let urlString = result as? String, let url = URL(string: urlString) {
