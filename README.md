@@ -5,21 +5,15 @@
 
 ## Features:
 
-Basic navigation stuff
-
-A clean design
+A slick design native to macOS, with features like toolbar customization, translucency, SF Symbols, and the San Francisco font
 
 macOS tabbing and multi-window support
-
-Support for macOS built in toolbar customizations
 
 Favicon and page title loading support
 
 An extremely basic attempt at adblocking
 
 Completely WebKit and SwiftUI based, extremely lightweight and efficient
-
-Uses system font on all webpages
 
 ## Information:
 
@@ -31,6 +25,8 @@ Current app icon designer: [@dootskyre on Twitter](https://twitter.com/dootskyre
 
 ## What's next?
 
+Selecting all text upon focusing address bar
+
 Potentially a home button
 
 A clear cache/cookies/data button (near future honestly)
@@ -38,3 +34,19 @@ A clear cache/cookies/data button (near future honestly)
 File download support
 
 Maybe some commands to enter into the address bar, for easter eggs and functional reasons...
+
+## Wish list (No clue if it's coming or not)
+
+Better tabbing support
+
+Settings menu with customization for custom CSS/JS and page translucency
+
+Alternative app icons
+
+Automatic shortening of URLs in address bar when not being edited (Shockingly hard.)
+
+Pinch to zoom
+
+Trackpad gestures
+
+Touch Bar support
