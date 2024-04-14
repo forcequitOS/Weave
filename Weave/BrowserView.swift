@@ -39,21 +39,64 @@ struct BrowserView: View {
                 }
             }
         }
-        return "\(defaultUserAgent ?? "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/621.4.20 (KHTML, like Gecko) Weave/FallbackUserAgent") Version/\(safariVersion) Safari/\(webKitVersion)"
+        return "\(defaultUserAgent ?? "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/621.4.20 (KHTML, like Gecko) Weave/Fallback") Version/\(safariVersion) Safari/\(webKitVersion)"
     }()
     
+    // Creates a view to make the translucency effect for the window
+    struct VisualEffectView: NSViewRepresentable {
+        func makeNSView(context: Context) -> NSVisualEffectView {
+            let effectView = NSVisualEffectView()
+            effectView.state = .active
+            return effectView
+        }
+        func updateNSView(_ nsView: NSVisualEffectView, context: Context) {
+        }
+    }
+    
+    // Primary view
     var body: some View {
+        // Sets the opacity for the window (72.5% by default, 70% and 80% also work well here)
+        let windowOpacity = 0.725
+        // Variable binding initialization
         WebView(webView: webView, pageTitle: $pageTitle, URLString: $URLString, faviconImage: $faviconImage, userAgent: $userAgent)
+        // Everything to load at app start
             .onAppear {
-                print(userAgent)
-                // CSS Style Injection
-                var sysAccent = NSColor.systemAccentColor.hexString
+                // Preparing accent color variables
+                let sysAccent = NSColor.systemAccentColor.hexString
+                let sysAccentDim = NSColor.systemAccentColor.blended(withFraction: 1.4, of: .black)!.hexString
+                let sysAccentBright = NSColor.systemAccentColor.blended(withFraction: 0.4, of: .white)!.hexString
+                // CSS Stylesheet injection
                 let styleSheet = """
                     var style = document.createElement('style');
                     style.innerHTML = `
-                        * {
-                            font-family: -apple-system !important;
-                        }
+                    * {
+                        font-family: -apple-system !important;
+                        letter-spacing: 0px !important;
+                    }
+                
+                    button, input[type="button"], input[type="submit"] {
+                        background-color:\(sysAccent);
+                    }
+                
+                    a {
+                        color:\(sysAccent);
+                        text-decaration: none !important;
+                        transition: 0.25s !important;
+                    }
+                    
+                    a:visited {
+                        color:\(sysAccentDim);
+                    }
+                
+                    a:link {
+                        text-decaration: none !important;
+                    }
+                
+                    a:hover {
+                        text-decaration: underline !important;
+                        color: \(sysAccentBright);
+                        transition: 0.25s !important;
+                    }
                     `;
                     document.head.appendChild(style);
                 """
@@ -90,7 +133,6 @@ struct BrowserView: View {
         
             // Toolbar with keyboard shortcuts and tooltips
             .toolbar (id:"toolbar"){
-                
                 // Back button (cmd + ←)
                 ToolbarItem(id:"back", placement: .navigation) {
                     Button(action: goBack) {
@@ -177,6 +219,15 @@ struct BrowserView: View {
                     .keyboardShortcut("c", modifiers: [.command, .shift])
                 }
                 
+                // New tab button (cmd + t)
+                ToolbarItem(id: "newTab", placement: .primaryAction) {
+                    Button(action: newTab) {
+                        Label("New Tab", systemImage: "plus")
+                    }
+                    .help("Open a new tab")
+                    .keyboardShortcut("t", modifiers: [.command])
+                }
+                
                 // Share button (cmd + shift + s)
                 ToolbarItem(id:"share", placement: .primaryAction) {
                     Button(action: {
@@ -188,9 +239,23 @@ struct BrowserView: View {
                     .keyboardShortcut("s", modifiers: [.command, .shift])
                 }
             }
+            .opacity(windowOpacity) // Sets window opacity based on windowOpacity variable declared earlier (This also allows for wallpaper tinting!)
+            .background(VisualEffectView().ignoresSafeArea()) // Uses the VisualEffectView created earlier for translucent web view
     }
 
     // Sets up functions for webpage commands
+    // Spawns a new tab within same window
+    private func newTab() {
+        if let currentWindow = NSApp.keyWindow,
+           let windowController = currentWindow.windowController {
+            windowController.newWindowForTab(nil)
+            if let newWindow = NSApp.keyWindow,
+               currentWindow != newWindow {
+                currentWindow.addTabbedWindow(newWindow, ordered: .above)
+            }
+        }
+    }
+    
     // Copies URL to clipboard
     private func copyURL() {
         let pasteboard = NSPasteboard.general
