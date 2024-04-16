@@ -5,7 +5,7 @@
 
 ## Features:
 
-A slick design native to macOS, with features like toolbar customization, native tabbing, and SF Symbols
+Built for macOS, with features like toolbar customization, native tabbing, Share Sheet support, and SF Symbols
 
 Brings the macOS world into your browser, with translucency effects, the San Francisco font, and your accent color automatically integrated across a wide range of websites
 
@@ -13,7 +13,7 @@ Favicon and page title loading support
 
 Adblocking built directly in
 
-Completely WebKit and SwiftUI based, extremely lightweight and efficient
+Fully WebKit based, extremely lightweight and efficient
 
 ## Information:
 
@@ -28,6 +28,8 @@ Current app icon designer: [@dootskyre on Twitter](https://twitter.com/dootskyre
 Additional theming and styling enhancements (potentially a custom dark mode implementation, or more accent based theming)
 
 Selecting all text upon focusing address bar
+
+Fixing permissions
 
 Potentially a home button
 
