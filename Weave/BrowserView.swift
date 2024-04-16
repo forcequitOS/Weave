@@ -78,7 +78,7 @@ struct BrowserView: View {
                         color:\(sysAccent);
                         text-decoration: none !important;
                         text-decoration-color: \(sysAccent);
-                        transition: 0.25s !important;
+                        transition: 0.15s !important;
                         font-weight: 500;
                     }
                     
@@ -98,18 +98,18 @@ struct BrowserView: View {
                         text-decoration: none !important;
                         text-decoration-color: \(sysAccentBright);
                         color: \(sysAccentBright);
-                        transition: 0.25s !important;
+                        transition: 0.15s !important;
                         font-weight: 600;
                     }
                 
                     button, input[type="button"], input[type="submit"] {
                         font-weight: 500;
-                        transition: 0.25s !important;
+                        transition: 0.15s !important;
                     }
                 
                     button:hover, input[type="button"]:hover, input[type="submit"]:hover {
                         font-weight: 600;
-                        transition: 0.25s !important;
+                        transition: 0.15s !important;
                     }
 
                     h1 {
