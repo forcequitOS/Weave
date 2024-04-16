@@ -1,5 +1,5 @@
 # Weave for Mac
-### This was an experiment I did to make a web browser using ChatGPT and is also my playground for messing around with Swift(UI). Don't seriously use this as your main browser.
+### This is my SwiftUI, JavaScript, and CSS experimenting playground, partially made with ChatGPT. Don't seriously use this as your main browser.
 ![A screenshot of the Weave application running on a Mac inside of a window](https://github.com/CtrliPhones/Weave/blob/main/Weave%20Preview.png?raw=true)
 *But, while we're here...*
 
