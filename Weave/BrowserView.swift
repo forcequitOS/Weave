@@ -61,11 +61,11 @@ struct BrowserView: View {
         WebView(webView: webView, pageTitle: $pageTitle, URLString: $URLString, faviconImage: $faviconImage, userAgent: $userAgent)
         // Everything to load at app start
             .onAppear {
-                // Preparing accent color variables
+                // Sets accent color variables to use in CSS
                 let sysAccent = NSColor.systemAccentColor.hexString
                 let sysAccentDim = NSColor.systemAccentColor.blended(withFraction: 1.4, of: .black)!.hexString
                 let sysAccentBright = NSColor.systemAccentColor.blended(withFraction: 0.4, of: .white)!.hexString
-                // CSS Stylesheet injection
+                // CSS Stylesheet injection for text and color styling
                 let styleSheet = """
                     var style = document.createElement('style');
                     style.innerHTML = `
@@ -74,49 +74,89 @@ struct BrowserView: View {
                         letter-spacing: 0px !important;
                     }
                 
-                    button, input[type="button"], input[type="submit"] {
-                        background-color:\(sysAccent);
-                    }
-                
                     a {
                         color:\(sysAccent);
-                        text-decaration: none !important;
+                        text-decoration: none !important;
+                        text-decoration-color: \(sysAccent);
                         transition: 0.25s !important;
+                        font-weight: 500;
                     }
                     
                     a:visited {
+                        text-decoration: none !important;
+                        text-decoration-color: \(sysAccentDim);
                         color:\(sysAccentDim);
+                        transition: 0.25s !important;
                     }
                 
                     a:link {
-                        text-decaration: none !important;
+                        text-decoration: none !important;
+                        transition: 0.25s !important;
                     }
                 
-                    a:hover {
-                        text-decaration: underline !important;
+                    a:hover, a:active {
+                        text-decoration: none !important;
+                        text-decoration-color: \(sysAccentBright);
                         color: \(sysAccentBright);
                         transition: 0.25s !important;
+                        font-weight: 600;
+                    }
+                
+                    button, input[type="button"], input[type="submit"] {
+                        font-weight: 500;
+                        transition: 0.25s !important;
+                    }
+                
+                    button:hover, input[type="button"]:hover, input[type="submit"]:hover {
+                        font-weight: 600;
+                        transition: 0.25s !important;
+                    }
+
+                    h1 {
+                        font-weight: 800 !important;
+                    }
+                
+                    h2 {
+                        font-weight: 700 !important;
+                    }
+                
+                    h3, h4, h5, h6 {
+                        font-weight: 600 !important;
+                    }
+                
+                    sub {
+                        font-weight: 300 !important;
                     }
                     `;
                     document.head.appendChild(style);
                 """
 
-                // Extremely basic CSS Adblock Injection
+                // Injecting a simple adblocker with CSS and JS, a bit more advanced than the old one.
                 let adBlockerScript = """
-                    var adBlockStyle = document.createElement('style');
-                    adBlockStyle.innerHTML = `
-                        /* Hide common ad classes */
-                        .ad-banner, .ad-wrapper, .ad-container, .ad, .ads, .adsense, .adslot, .ad-badge {
-                            display: none !important;
-                        }
+                function findAdsInDocument() {
+                    const adIDs = ["Ad","RadAd","bbccom","hbBHeaderSpon","hiddenHeaderSpon","navbar_adcode","pagelet_adbox","rightAds","rightcolumn_adcode","tracker_advertorial","adbrite","dclkAds","konaLayer","a.kLink span[id^='preLoadWrap'][class='preLoadWrap']","div[id='tooltipbox'][class^='itxt']","div[id='google_ads_div']","embed[flashvars*='AdID']","iframe[src*='clicksor.com']","img[src*='clicksor.com']","ispan#ab_pointer","#A9AdsMiddleBoxTop","#A9AdsOutOfStockWidgetTop","#A9AdsServicesWidgetTop","#Ad2","#Ad3Left","#Ad3Right","#AdBar1","#AdContainerTop","#AdHeader","#AdRectangle","#AdShowcase_F1","#AdSky23","#AdSkyscraper","#AdSponsor_SF","#AdTargetControl1_iframe","#Ad_Block","#Ad_Center1","#Ad_Top","#Adrectangle","#AdsContent","#AdsWrap","#AdvertMPU23b","#Advertorial","#BannerAdvert","#BigBoxAd","#CompanyDetailsNarrowGoogleAdsPresentationControl","#CompanyDetailsWideGoogleAdsPresentationControl","#ContentAd","#ContentAd1","#ContentAd2","#FP_Ad","#FooterAd","#FooterAdContainer","#HEADERAD","#HeaderAdsBlock","#HeroAd","#HomeAd1","#HouseAd","#Journal_Ad_125","#Journal_Ad_300","#LeftAdF1","#LeftAdF2","#PageLeaderAd","#RightSponsoredAd","#SectionAd300-250","#SidebarAdContainer","#SkyAd","#SponsoredAd","#TOP_ADROW","#TopAdPos","#VM-MPU-adspace","#VM-header-adwrap","#XEadLeaderboard","#XEadSkyscraper","#ad-160x600","#ad-250x300","#ad-300x250","#ad-300x250Div","#ad-728","#ad-banner","#ad-bottom","#ad-bottom-wrapper","#ad-footer","#ad-footprint-160x600","#ad-front-footer","#ad-front-sponsoredlinks","#ad-halfpage","#ad-label","#ad-leaderboard","#ad-leaderboard-bottom","#ad-leaderboard-top","#ad-left","#ad-lrec","#ad-medium-rectangle","#ad-middlethree","#ad-middletwo","#ad-module","#ad-mpu","#ad-placard","#ad-rectangle","#ad-righttop","#ad-side-text","#ad-skyscraper","#ad-space","#ad-splash","#ad-target","#ad-teaser","#ad-top","#ad-tower","#ad-typ1","#ad-wrap-right","#ad-wrapper1","#ad-yahoo-simple","#ad125BL","#ad125BR","#ad125TL","#ad125TR","#ad125x125","#ad160x600","#ad160x600right","#ad1Sp","#ad2Sp","#ad3","#ad300","#ad300-250","#ad300X250","#ad300x150","#ad300x250","#ad300x250Module","#ad300x60","#ad336","#ad375x85","#ad526x250","#ad600","#ad7","#ad728Wrapper","#adB","#adBadges","#adBanner120x600","#adBannerTable","#adBannerTop","#adBar","#adBlock125","#adBlocks","#adFps","#adFrame","#adHCM","#adHeader","#adHov01","#adHov02","#adHov03","#adHov04","#adHov05","#adImg","#adKona","#adLREC","#adLargeRectangle","#adLeaderboard","#adMPU","#adMRec","#adNewsRight1","#adNewsRight2","#adNewsRight3","#adRectangle","#adResult2","#adRight","#adSky","#adSky3"];
 
-                        /* Hide ads from specific URLs */
-                        [href*="doubleclick.net"], [href*="googleadservices.com"], [href*="advertising.com"], [src*="adserver.com"] {
-                            display: none !important;
-                        }
-                    `;
-                    document.head.appendChild(adBlockStyle);
+                    const allElements = [...document.querySelectorAll('*')];
+                    const adElements = allElements.filter(element => {
+                        const id = element.id || '';
+                        const classes = element.className || '';
+                        return adIDs.some(adID => {
+                            const regex = new RegExp(`(^|\\s)${adID}(\\s|$)`, 'i');
+                            return regex.test(id) || regex.test(classes);
+                        });
+                    });
+
+                    const css = adElements.map(element => `#${element.id} { display: none !important; }`).join('\n');
+
+                    const style = document.createElement('style');
+                    style.type = 'text/css';
+                    style.appendChild(document.createTextNode(css));
+
+                    document.head.appendChild(style);
+                }
                 """
+                
+                // Actually injects scripts into webview
                 let adBlockInject = WKUserScript(source: adBlockerScript, injectionTime: .atDocumentEnd, forMainFrameOnly: false)
                 webView.configuration.userContentController.addUserScript(adBlockInject)
 
