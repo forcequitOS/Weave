@@ -5,13 +5,13 @@
 
 ## Features:
 
-A slick design native to macOS, with features like toolbar customization, translucency, SF Symbols, and the San Francisco font
+A slick design native to macOS, with features like toolbar customization, native tabbing, and SF Symbols
 
-macOS tabbing and multi-window support
+Brings the macOS world into your browser, with translucency effects, the San Francisco font, and your accent color automatically integrated across a wide range of websites
 
 Favicon and page title loading support
 
-An extremely basic attempt at adblocking
+Adblocking built directly in
 
 Completely WebKit and SwiftUI based, extremely lightweight and efficient
 
@@ -24,6 +24,8 @@ Built with Xcode 15, SwiftUI, WebKit, and of course, made (kinda) with ChatGPT.
 Current app icon designer: [@dootskyre on Twitter](https://twitter.com/dootskyre)
 
 ## What's next?
+
+Additional theming and styling enhancements (potentially a custom dark mode implementation, or more accent based theming)
 
 Selecting all text upon focusing address bar
 
@@ -50,3 +52,5 @@ Pinch to zoom
 Trackpad gestures
 
 Touch Bar support
+
+Support to build web applications directly from Weave! (May end up as a spinoff project)
